@@ -22,7 +22,7 @@ class UpliftModel:
         self.model_x_t = None
         self.model_x_c = None
 
-    def fit(self, X, treatment, outcome) -> "UpliftModel":
+    def fit(self, X, treatment, outcome) -> UpliftModel:
         X, treatment, outcome = np.asarray(X), np.asarray(treatment), np.asarray(outcome)
         if self.model_type == "t_learner":
             self.model_t = clone(self.base_estimator).fit(X[treatment == 1], outcome[treatment == 1])
