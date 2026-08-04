@@ -6,7 +6,7 @@ intervention actually cause this outcome," not just correlation.
 ## Quickstart
 
 ```bash
-pip install -e .
+pip install -e ".[dev]"
 pytest tests/ -v
 ```
 
@@ -109,7 +109,7 @@ returns a `.summary()`-able result object with its own diagnostics
 No real-market benchmark — every test (`tests/test_causal_lens.py`) builds a
 synthetic dataset with a **known** injected effect and asserts the estimator
 recovers it within a stated tolerance (e.g. DiD ATT within ±0.5 of an
-injected 2.0). Run `pytest tests/ -v` to reproduce; there's no accuracy
+injected 2.0). Run `pip install -e ".[dev]" && pytest tests/ -v` to reproduce; there's no accuracy
 number to quote beyond "recovers the known effect within tolerance."
 
 ## Limitations
