@@ -3,6 +3,18 @@
 Causal inference toolkit — four independently usable methods for "did this
 intervention actually cause this outcome," not just correlation.
 
+## Quickstart
+
+```bash
+pip install -e .
+pytest tests/ -v
+```
+
+Four independent estimators, each importable on its own (see below) — no
+single unified "run" entrypoint, since the input shape differs per method
+(A/B needs two groups, DiD/Synthetic Control need panel data, Uplift needs
+treatment+outcome+features).
+
 ## When to use which method
 
 | Method | Use when | Example here |
@@ -81,9 +93,28 @@ synthetic dataset with a **known** ground-truth effect and checks the
 estimator recovers it within a loose tolerance (e.g. DiD ATT within ±0.5 of
 the injected 2.0).
 
-## What's here vs. the original spec
+## Architecture
 
-Skipped for this pass — add if actually needed:
+Each method is a standalone class over plain pandas/numpy/scipy — `ABTest`,
+`DifferenceInDifferences`, `SyntheticControl`, `UpliftModel` share no base
+class or common pipeline, deliberately: the four techniques answer different
+causal questions with different data shapes, and a forced common interface
+would leak abstraction into the estimators (e.g. DiD's clustering vs
+Synthetic Control's donor-weight optimization have nothing in common). Each
+returns a `.summary()`-able result object with its own diagnostics
+(SRM check, parallel-trends test, placebo test, Qini curve).
+
+## Results
+
+No real-market benchmark — every test (`tests/test_causal_lens.py`) builds a
+synthetic dataset with a **known** injected effect and asserts the estimator
+recovers it within a stated tolerance (e.g. DiD ATT within ±0.5 of an
+injected 2.0). Run `pytest tests/ -v` to reproduce; there's no accuracy
+number to quote beyond "recovers the known effect within tolerance."
+
+## Limitations
+
+What's not here — add if actually needed:
 - Sequential testing (mSPRT), multiple-testing correction, novelty-effect detection in the A/B module
 - Callaway-Sant'Anna staggered-timing DiD and Bacon decomposition (only single-treatment-date DiD is implemented)
 - Causal Forest / `econml` (X-Learner above covers doubly-robust-ish uplift without the dependency)
