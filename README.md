@@ -106,11 +106,64 @@ returns a `.summary()`-able result object with its own diagnostics
 
 ## Results
 
-No real-market benchmark — every test (`tests/test_causal_lens.py`) builds a
-synthetic dataset with a **known** injected effect and asserts the estimator
-recovers it within a stated tolerance (e.g. DiD ATT within ±0.5 of an
-injected 2.0). Run `pip install -e ".[dev]" && pytest tests/ -v` to reproduce; there's no accuracy
-number to quote beyond "recovers the known effect within tolerance."
+### Correctness: recovering a known effect
+
+Every test (`tests/test_causal_lens.py`) builds a synthetic dataset with a
+**known** injected effect and asserts the estimator recovers it within a stated
+tolerance (e.g. DiD ATT within ±0.5 of an injected 2.0). That is the right test
+for estimator correctness — you cannot check an estimator against data whose
+true effect you do not know.
+
+### A real question on real data
+
+Synthetic tests say the maths is right; they say nothing about whether the
+toolkit survives contact with real data. So:
+
+```bash
+python examples/nse_bonus_turnover.py
+```
+
+**Question:** does a bonus issue or stock split change how much a stock
+actually trades? The price change is arithmetic and is adjusted away. Whether a
+lower nominal price draws more participation is an empirical question with real
+disagreement in the literature.
+
+**Data:** real NSE bhavcopy from the sibling
+[nse-warehouse](https://github.com/siddharthgaur1/nse-warehouse) — 1.13M rows,
+3,969 symbols — and real corporate actions inferred from close-price
+discontinuities. Donor pools exclude any symbol with its own corporate action
+inside the window, since a donor that also split would contaminate the
+counterfactual.
+
+**One event** (SBC, 1:2 bonus, 2025-03-10; 20 donors, 100 sessions):
+
+| | |
+|---|---|
+| Effect on turnover | **+34.7%** vs the synthetic counterfactual |
+| Pre-period RMSPE | 0.365 |
+| Placebo p-value | 0.095 |
+
+A clean-looking positive result. **It does not survive replication.**
+
+**All 79 comparable events** in the same window, same estimator, same donor
+rules:
+
+| | |
+|---|---|
+| Mean effect | **−10.4%** |
+| Median effect | −6.6% |
+| Positive | 34 / 79 |
+| p < 0.05 | 14 / 79 |
+
+Thirty-four of seventy-nine positive is a coin flip. **The honest conclusion is
+that there is no consistent turnover effect** in this data, and the single-event
+result was the first event that happened to meet the data requirements — not a
+finding.
+
+That contrast is why `examples/nse_bonus_turnover.py` prints both numbers, in
+that order, every run. A causal toolkit that makes it easy to produce a
+publishable single-event result and hard to notice it does not replicate is
+worse than no toolkit.
 
 ## Limitations
 
@@ -118,5 +171,6 @@ What's not here — add if actually needed:
 - Sequential testing (mSPRT), multiple-testing correction, novelty-effect detection in the A/B module
 - Callaway-Sant'Anna staggered-timing DiD and Bacon decomposition (only single-treatment-date DiD is implemented)
 - Causal Forest / `econml` (X-Learner above covers doubly-robust-ish uplift without the dependency)
-- Real NSE/RBI datasets (`data/synthetic.py` generates all datasets used by tests — swap in `yfinance` fetchers when you want real-market results)
+- **Real data is now wired in** for synthetic control (`data/nse_real.py`, real NSE bhavcopy via nse-warehouse — see Results). The A/B, DiD and Uplift examples still run on `data/synthetic.py` generators; those need real experiment/panel data that this project does not have.
+- The real-data study covers a **single window (Mar 2025 – Mar 2026)** and one event type. 14 of 79 events clear p<0.05, which is above the ~4 expected by chance — worth a look, not a claim.
 - HTML report generation, Streamlit dashboard, notebooks — the library API is the deliverable here
