@@ -1,5 +1,9 @@
 # causal-lens
 
+[![Portfolio](https://img.shields.io/badge/↩-siddharthgaur1-111827?style=flat-square)](https://github.com/siddharthgaur1)
+[![CI](https://github.com/siddharthgaur1/causal-lens/actions/workflows/ci.yml/badge.svg)](https://github.com/siddharthgaur1/causal-lens/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 Causal inference toolkit — four independently usable methods for "did this
 intervention actually cause this outcome," not just correlation.
 

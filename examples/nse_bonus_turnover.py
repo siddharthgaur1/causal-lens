@@ -26,9 +26,9 @@ import numpy as np
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from causal_lens.synthetic_control.estimator import SyntheticControl  # noqa: E402
-from causal_lens.synthetic_control.inference import placebo_inference  # noqa: E402
-from data.nse_real import _connect, bonus_split_panel  # noqa: E402
+from causal_lens.synthetic_control.estimator import SyntheticControl
+from causal_lens.synthetic_control.inference import placebo_inference
+from data.nse_real import _connect, bonus_split_panel
 
 
 def study(d):
@@ -90,7 +90,7 @@ def main() -> int:
             if di["treated"] != sym:
                 continue
             _, e, _, pi = study(di)
-        except Exception:
+        except Exception:  # noqa: BLE001, S112 — per-symbol scan; one bad donor set shouldn't kill the run
             continue  # not enough clean sessions or donors around this event
         effects.append(e)
         pvals.append(pi)
