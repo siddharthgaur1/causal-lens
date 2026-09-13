@@ -7,6 +7,10 @@
 Causal inference toolkit — four independently usable methods for "did this
 intervention actually cause this outcome," not just correlation.
 
+![DiD event study on a synthetic panel recovering an injected effect of 2.0](docs/did-event-study.png)
+
+*Difference-in-Differences on a **synthetic** panel with a known injected ATT of 2.0 (`data/synthetic.py`), plotted with `DiDResult.event_study_plot`. Regenerate: `python examples/did_event_study_chart.py`.*
+
 ## Quickstart
 
 ```bash
