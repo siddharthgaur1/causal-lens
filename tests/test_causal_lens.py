@@ -57,6 +57,17 @@ def test_did_recovers_known_att():
     assert placebo["passes_placebo"], "no fake effect should exist before real treatment"
 
 
+def test_did_accepts_column_names_patsy_cannot_parse_bare():
+    # The README's own example uses outcome="return", a Python keyword.
+    panel = generate_did_panel(true_att=2.0, seed=2).rename(
+        columns={"outcome": "return", "treated": "is-treated"})
+    did = DifferenceInDifferences(panel, unit="unit", time="date", treatment="is-treated",
+                                   outcome="return", treatment_date="2023-07-01")
+    assert 1.5 < did.estimate(cluster_by="unit").att < 2.5
+    assert parallel_trends_test(panel, "unit", "date", "is-treated", "return",
+                                "2023-07-01")["parallel_trends_holds"]
+
+
 def test_synthetic_control_recovers_gap():
     rng = np.random.default_rng(3)
     dates = pd.date_range("2020-01-01", periods=40, freq="MS")

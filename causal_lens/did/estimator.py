@@ -62,9 +62,11 @@ class DifferenceInDifferences:
             pd.to_datetime(df[self.time]).dt.to_period("M") - self.treatment_date.to_period("M")
         ).apply(lambda x: x.n)
 
-        formula = f"{self.outcome} ~ _post + {self.treatment} + _did"
+        # Q() quotes column names, so names patsy can't parse bare (`return`,
+        # `log-ret`, `2023_ret`) still work.
+        formula = f"Q({self.outcome!r}) ~ _post + Q({self.treatment!r}) + _did"
         if covariates:
-            formula += " + " + " + ".join(covariates)
+            formula += " + " + " + ".join(f"Q({c!r})" for c in covariates)
 
         groups = df[cluster_by] if cluster_by else None
         cov_type = "cluster" if cluster_by else "HC1"
