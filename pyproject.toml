@@ -10,6 +10,8 @@ dependencies = ["pandas>=2.0", "numpy>=1.24", "scipy>=1.10", "statsmodels>=0.14"
 # Not a core dependency: the estimators themselves need nothing beyond numpy,
 # pandas and scipy.
 realdata = ["duckdb>=1.0"]
+# gap_plot() / event-study plots import matplotlib lazily; the estimators don't.
+plot = ["matplotlib>=3.7"]
 dev = ["pytest>=8.0"]
 
 [build-system]
