@@ -14,7 +14,7 @@ intervention actually cause this outcome," not just correlation.
 ## Quickstart
 
 ```bash
-pip install -e ".[dev]"
+pip install -e ".[dev]"        # add ",plot" for gap_plot() and the event-study chart
 pytest tests/ -v
 ```
 

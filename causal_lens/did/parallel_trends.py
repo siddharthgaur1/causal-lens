@@ -12,7 +12,7 @@ def parallel_trends_test(data: pd.DataFrame, unit: str, time: str, treatment: st
     treatment_date = pd.to_datetime(treatment_date)
     pre = data[pd.to_datetime(data[time]) < treatment_date].copy()
     pre["_t"] = pd.to_datetime(pre[time]).astype("int64")
-    model = smf.ols(f"{outcome} ~ _t * {treatment}", data=pre).fit()
+    model = smf.ols(f"Q({outcome!r}) ~ _t * Q({treatment!r})", data=pre).fit()
     interaction = next(p for p in model.params.index if ":" in p)
     return {
         "interaction_coef": round(float(model.params[interaction]), 6),
